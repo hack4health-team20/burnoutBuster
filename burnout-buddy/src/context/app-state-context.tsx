@@ -283,6 +283,7 @@ export const AppStateProvider = ({ children }: { children: ReactNode }) => {
             completedAt,
             timeAvailable: prev.timerSession.timeAvailable,
             postMood,
+            checkInId: prev.activeCheckInId, // Link to the originating check-in
           };
           resets = [...resets, reset];
         }

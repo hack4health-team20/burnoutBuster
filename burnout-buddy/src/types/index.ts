@@ -42,6 +42,7 @@ export interface ResetLog {
   completedAt?: string;
   timeAvailable: TimeAvailable;
   postMood?: PostMood;
+  checkInId?: string | null; // Reference to the originating check-in
 }
 
 export interface AppSettings {

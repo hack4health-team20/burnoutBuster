@@ -56,7 +56,17 @@ const analyzeUserPatterns = (checkIns: MoodCheckIn[], resets: ResetLog[]): UserP
 
   // Process all resets to determine effectiveness
   resets.forEach(reset => {
-    const checkIn = checkIns.find(ci => ci.practiceId === reset.practiceId);
+    // First try to match by checkInId if available (most accurate correlation)
+    let checkIn: MoodCheckIn | undefined;
+    if (reset.checkInId) {
+      checkIn = checkIns.find(ci => ci.id === reset.checkInId);
+    }
+    
+    // Fallback to matching by practiceId and timestamp if checkInId is not available
+    if (!checkIn) {
+      checkIn = checkIns.find(ci => ci.practiceId === reset.practiceId);
+    }
+    
     if (checkIn) {
       const improvement = calculateMoodImprovement(checkIn.mood, reset.postMood);
       totalImprovement += improvement;
@@ -112,7 +122,8 @@ const calculatePracticeScore = (
   timeAvailable: TimeAvailable,
   userPatterns: UserPattern,
   historicalEffectiveness: PracticeEffectiveness[],
-  currentHour: number
+  currentHour: number,
+  onShift: boolean
 ): number => {
   let baseScore = 0.5; // Default neutral score
 
@@ -151,6 +162,17 @@ const calculatePracticeScore = (
     baseScore += 0.05; // Small bonus for matching time
   }
 
+  // Factor 6: On-shift context
+  if (onShift) {
+    // When on shift, favor practices that can be done quickly between patients
+    if (practice.durationSeconds <= 150) { // 2.5 minutes or less
+      baseScore += 0.05; // Small bonus for quick practices when on shift
+    }
+  } else {
+    // When not on shift, practices of any duration are equally valid
+    // No additional adjustment needed
+  }
+
   // Ensure the score stays within bounds
   return Math.max(0, Math.min(1, baseScore));
 };
@@ -161,7 +183,17 @@ const buildPracticeEffectiveness = (checkIns: MoodCheckIn[], resets: ResetLog[])
 
   // Build effectiveness map from resets
   resets.forEach(reset => {
-    const checkIn = checkIns.find(ci => ci.practiceId === reset.practiceId);
+    // First try to match by checkInId if available (most accurate correlation)
+    let checkIn: MoodCheckIn | undefined;
+    if (reset.checkInId) {
+      checkIn = checkIns.find(ci => ci.id === reset.checkInId);
+    }
+    
+    // Fallback to matching by practiceId and timestamp if checkInId is not available
+    if (!checkIn) {
+      checkIn = checkIns.find(ci => ci.practiceId === reset.practiceId);
+    }
+    
     if (checkIn) {
       const practiceId = reset.practiceId;
       const mood = checkIn.mood;
@@ -231,7 +263,8 @@ export const getMLRecommendations = (
         timeAvailable,
         userPatterns,
         practiceEffectiveness,
-        currentHour
+        currentHour,
+        onShift
       )
     }))
     .sort((a, b) => b.score - a.score) // Sort by score descending
