@@ -42,6 +42,7 @@ export const AIWellnessCoach = ({ onMoodSelected, timeAvailable, onShift }: AIWe
   const [inputText, setInputText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [selectedMood, setSelectedMood] = useState<MoodValue | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null); // Will hold the speech recognition object
   const { data } = useAppState();
@@ -174,6 +175,8 @@ export const AIWellnessCoach = ({ onMoodSelected, timeAvailable, onShift }: AIWe
   };
 
   const handleMoodConfirmation = (mood: MoodValue) => {
+    // Set the selected mood to show visual feedback
+    setSelectedMood(mood);
     // Use the reason from the API analysis
     onMoodSelected(mood, messages[messages.length - 1].text);
   };
@@ -242,12 +245,15 @@ export const AIWellnessCoach = ({ onMoodSelected, timeAvailable, onShift }: AIWe
             {(['calm', 'ok', 'stressed', 'exhausted'] as MoodValue[]).map((mood) => (
               <Button
                 key={mood}
-                variant="secondary"
+                variant={selectedMood === mood ? "primary" : "secondary"}
                 size="sm"
                 onClick={() => handleMoodConfirmation(mood)}
                 className="capitalize"
               >
                 {mood}
+                {selectedMood === mood && (
+                  <span className="ml-1">✓</span>
+                )}
               </Button>
             ))}
           </div>
