@@ -1,6 +1,6 @@
 import { FirebaseApp, initializeApp, getApps, getApp } from "firebase/app";
 import { Auth, GoogleAuthProvider, getAuth } from "firebase/auth";
-import { Firestore, getFirestore } from "firebase/firestore";
+import { Firestore, FirestoreSettings, getFirestore, initializeFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -21,6 +21,12 @@ const requiredKeys: (keyof typeof firebaseConfig)[] = [
 export const isFirebaseConfigured = requiredKeys.every((key) => Boolean(firebaseConfig[key]));
 
 let appInstance: FirebaseApp | null = null;
+let firestoreInstance: Firestore | null = null;
+
+const firestoreSettings: FirestoreSettings = {
+  experimentalAutoDetectLongPolling: true,
+  useFetchStreams: false,
+};
 
 export const getFirebaseApp = () => {
   if (!isFirebaseConfigured) {
@@ -42,4 +48,17 @@ export const getFirebaseAuth = (): Auth => getAuth(getFirebaseApp());
 
 export const getGoogleProvider = () => new GoogleAuthProvider();
 
-export const getDb = (): Firestore => getFirestore(getFirebaseApp());
+export const getDb = (): Firestore => {
+  if (firestoreInstance) return firestoreInstance;
+
+  const app = getFirebaseApp();
+
+  // Next.js can render components on the server, so guard against SSR usage.
+  if (typeof window === "undefined") {
+    firestoreInstance = getFirestore(app);
+  } else {
+    firestoreInstance = initializeFirestore(app, firestoreSettings);
+  }
+
+  return firestoreInstance;
+};
