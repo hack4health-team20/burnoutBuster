@@ -62,11 +62,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const stored = readStoredAuth();
     if (stored?.sessionType === "demo") {
+      const storedDemoName = stored.user?.displayName ?? "Dr. Demo";
       setSessionType("demo");
       setUser(
         stored.user ?? {
           uid: "demo",
-          displayName: stored?.user?.displayName ?? "Dr. Demo",
+          displayName: storedDemoName,
         }
       );
       setLoading(false);
@@ -129,8 +130,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setError(null);
       const auth = getFirebaseAuth();
       const provider = getGoogleProvider();
-      await signInWithPopup(auth, provider);
-      setSessionType("firebase");
+      const credential = await signInWithPopup(auth, provider);
+      if (credential.user) {
+        const firebaseUser = credential.user;
+        const profile: UserProfile = {
+          uid: firebaseUser.uid,
+          displayName: firebaseUser.displayName ?? "Doctor",
+          email: firebaseUser.email,
+          photoURL: firebaseUser.photoURL,
+        };
+        setUser(profile);
+        setSessionType("firebase");
+        writeStoredAuth({ sessionType: "firebase", user: profile });
+      } else {
+        setSessionType(null);
+        setUser(null);
+        writeStoredAuth(null);
+      }
     } catch (authError) {
       console.error("Google sign-in failed", authError);
       setError("Google sign-in was interrupted. Please try again.");

@@ -1,7 +1,7 @@
 "use client";
 
 import { ButtonHTMLAttributes } from "react";
-import { motion } from "framer-motion";
+import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "@/lib/cn";
 
 interface ChipToggleProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -21,7 +21,7 @@ export const ChipToggle = ({ active, className, children, ...props }: ChipToggle
         : "border-white/60 bg-white/40 text-[var(--muted)] hover:bg-white/70",
       className
     )}
-    {...props}
+    {...(props as HTMLMotionProps<"button">)}
   >
     {children}
   </MotionButton>
