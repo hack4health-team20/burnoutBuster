@@ -42,6 +42,7 @@ export interface ResetLog {
   completedAt?: string;
   timeAvailable: TimeAvailable;
   postMood?: PostMood;
+  checkInId?: string | null; // Reference to the originating check-in
 }
 
 export interface AppSettings {
@@ -83,4 +84,23 @@ export interface TimerSession {
   durationSeconds: number;
   mood: MoodValue;
   timeAvailable: TimeAvailable;
+}
+
+export interface GamificationInput {
+  doctorName: string;
+  streakDays: number;
+  bestDay?: string;
+  weekCheckIns: number;
+  weekResets: number;
+  lifetimeCheckIns: number;
+  lifetimeResets: number;
+  recentMoods: MoodValue[];
+  recentPractices: string[];
+  highlightPractices: { name: string; completedAt?: string }[];
+}
+
+export interface GamificationStories {
+  achievementStory: string;
+  streakCelebration: string;
+  progressNarrative: string;
 }
