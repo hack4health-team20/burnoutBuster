@@ -76,12 +76,12 @@ export async function POST(req: Request) {
       },
     });
 
-    const textOutput = response.output?.[0]?.content?.[0];
-    if (textOutput?.type !== "output_text") {
-      throw new Error("Unexpected AI response format.");
+    const rawText = response.output_text;
+    if (!rawText) {
+      throw new Error("AI response did not include text output.");
     }
 
-    const stories = parseAIResponse(textOutput.text ?? "");
+    const stories = parseAIResponse(rawText);
     return NextResponse.json({ stories });
   } catch (error) {
     console.error("Gamification AI error", error);

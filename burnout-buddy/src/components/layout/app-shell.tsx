@@ -29,12 +29,12 @@ export const AppShell = ({ title, description, children }: AppShellProps) => {
   const greetingName = user?.displayName ? user.displayName.replace(/^Dr\.?\s*/i, "Dr. ") : "Dr. Friend";
 
   return (
-    <div className="relative mx-auto flex min-h-screen max-w-5xl flex-col gap-8 px-4 pb-16 pt-10 sm:px-10">
+    <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col gap-6 px-4 pb-16 pt-6 sm:gap-8 sm:px-10 sm:pt-10">
       <motion.nav
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="sticky top-6 z-20 flex items-center justify-between rounded-[28px] border border-white/40 bg-white/80 px-6 py-3 shadow-[var(--shadow-soft)] backdrop-blur-xl"
+        className="sticky top-4 z-20 flex flex-col gap-4 rounded-[28px] border border-white/40 bg-white/90 px-5 py-4 shadow-[var(--shadow-soft)] backdrop-blur-xl sm:top-6 sm:flex-row sm:items-center sm:justify-between sm:px-6"
       >
         <div className="flex flex-col">
           <span className="text-xs uppercase tracking-[0.3em] text-[var(--muted)]/70">
@@ -44,8 +44,8 @@ export const AppShell = ({ title, description, children }: AppShellProps) => {
             Hi, {isDemo ? "there" : greetingName}
           </span>
         </div>
-        <div className="flex items-center gap-3 text-sm">
-          <div className="flex items-center gap-2">
+        <div className="flex w-full flex-col gap-3 text-sm sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
             {navItems.map((item) => {
               const active = pathname?.startsWith(item.href);
               return (
@@ -53,7 +53,7 @@ export const AppShell = ({ title, description, children }: AppShellProps) => {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "rounded-full px-4 py-2 text-sm font-medium transition",
+                    "rounded-full px-3 py-2 text-sm font-medium transition sm:px-4",
                     active
                       ? "bg-[var(--accent)] text-white shadow-sm"
                       : "text-[var(--muted)] hover:bg-white/70"
@@ -70,6 +70,7 @@ export const AppShell = ({ title, description, children }: AppShellProps) => {
               size="sm"
               subtleHover
               disabled={signingOut}
+              className="w-full justify-center sm:w-auto"
               onClick={async () => {
                 setSigningOut(true);
                 try {

@@ -10,8 +10,10 @@ import {
   BarElement,
   Tooltip,
   Legend,
+  type ChartData,
+  type ChartTypeRegistry,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
+import { Chart } from "react-chartjs-2";
 import { WeeklySummary } from "@/lib/analytics";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Tooltip, Legend);
@@ -21,7 +23,7 @@ interface WeeklyChartProps {
 }
 
 export const WeeklyChart = ({ summary }: WeeklyChartProps) => {
-  const chartRef = useRef<ChartJS<"line"> | null>(null);
+  const chartRef = useRef<ChartJS<"bar"> | null>(null);
 
   useEffect(() => {
     if (!chartRef.current) return;
@@ -29,7 +31,7 @@ export const WeeklyChart = ({ summary }: WeeklyChartProps) => {
   }, [summary]);
 
   const labels = summary.points.map((point) => point.label);
-  const data = {
+  const data: ChartData<keyof ChartTypeRegistry> = {
     labels,
     datasets: [
       {
@@ -66,8 +68,9 @@ export const WeeklyChart = ({ summary }: WeeklyChartProps) => {
         </div>
       </div>
       <div className="mt-6">
-        <Line
+        <Chart
           ref={chartRef}
+          type="bar"
           data={data}
           options={{
             responsive: true,
@@ -95,7 +98,6 @@ export const WeeklyChart = ({ summary }: WeeklyChartProps) => {
                 beginAtZero: true,
                 grid: {
                   color: "rgba(67, 82, 115, 0.08)",
-                  drawBorder: false,
                 },
                 ticks: {
                   precision: 0,

@@ -62,11 +62,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const stored = readStoredAuth();
     if (stored?.sessionType === "demo") {
+      const storedDemoName = stored.user?.displayName ?? "Dr. Demo";
       setSessionType("demo");
       setUser(
         stored.user ?? {
           uid: "demo",
-          displayName: stored?.user?.displayName ?? "Dr. Demo",
+          displayName: storedDemoName,
         }
       );
       setLoading(false);
